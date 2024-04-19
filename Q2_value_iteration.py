@@ -42,7 +42,7 @@ def value_iteration(env, gamma=0.9, epsilon=1e-6):
 
     #Code for extracting optimal policy from the value function
 
-    policy = np.zeros(num_states)   #initializing the policy
+    policy = np.zeros(num_states, dtype=int)   #initializing the policy
     for state in range(num_states): #for each state
         temp_values = np.zeros(num_actions) 
         for action in range(num_actions):  #for each action
