@@ -21,39 +21,39 @@ def value_iteration(env, gamma=0.9, epsilon=1e-6):
     num_states = env.observation_space.n
     num_actions = env.action_space.n
 
-    # Initialize the value function
+    # Initialize the value function for all states as 0
     V = np.zeros(num_states)
-
-    #Write your code to implement value iteration main loop
+    
+    # Learning the policy here
     while True:
         delta = 0
         for state in range(num_states):
-            v = V[state]
-            q_values = np.zeros(num_actions)
-            for action in range(num_actions):
-                for prob, next_state, reward, done in env.P[state][action]:
-                    q_values[action] += prob * (reward + gamma * V[next_state]) #discount factor
-            V[state] = np.max(q_values)
-            delta = max(delta, np.abs(v - V[state])) 
-        if delta < epsilon: # delta threshold
+            v = V[state] #value of the current state
+            # Applying the Bellman equation to update the value of the state
+            temp_values = np.zeros(num_actions) 
+            for action in range(num_actions): #for each action
+                for prob, next_state, reward, _ in env.P[state][action]: #for each possible transition
+                    temp_values[action] += prob * (reward + gamma * V[next_state]) #summation of the expected value of the next state
+             #Updating the value of the state by choosing action that maximizes the expected value of the next state
+            V[state] = np.max(temp_values)
+            delta = max(delta, np.abs(v - V[state])) #calculating the change in value of the state
+        if delta < epsilon: #if the change in value of the state is less than the threshold the optimal plocy is learnt
             break
 
-         
-    # Write your code here to extract the optimal policy from value function. 
-    # For each state, the policy will tell you the action to take
-    policy = np.zeros(num_states, dtype=int)
-    for state in range(num_states):
-        q_values = np.zeros(num_actions)
-        for action in range(num_actions):
-            for prob, next_state, reward, done in env.P[state][action]:
-                q_values[action] += prob * (reward + gamma * V[next_state])
-        policy[state] = np.argmax(q_values)
+    #Code for extracting optimal policy from the value function
+
+    policy = np.zeros(num_states)   #initializing the policy
+    for state in range(num_states): #for each state
+        temp_values = np.zeros(num_actions) 
+        for action in range(num_actions):  #for each action
+            for prob, next_state, reward,_ in env.P[state][action]: #for each possible transition
+                temp_values[action] += prob * (reward + gamma * V[next_state]) #summation of the expected value of the next state
+        policy[state] = np.argmax(temp_values) #selecting the action that maximizes the expected value of the next state
     
-       
     return policy, V
 
 # Run value iteration
-policy, V = value_iteration(env)
+policy, V = value_iteration(env, gamma=discount_factor, epsilon=delta_threshold)
 
 # Print results
 print("Optimal Value Function:")
